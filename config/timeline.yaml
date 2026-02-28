@@ -82,11 +82,12 @@
 # 📋 预设模板一览（选一个就行）
 # ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
 #
-#   1️⃣ always_on        全天候，有新增就推（默认）
-#   2️⃣ morning_evening  全天推送 + 晚间汇总（推荐大多数人）
-#   3️⃣ office_hours     工作日三段式：到岗速览→午间热点→收工汇总
-#   4️⃣ night_owl        午后速览 + 深夜全天汇总
-#   5️⃣ custom           完全自定义（需要编辑本文件底部的 custom 段）
+#   1️⃣ always_on          全天候，有新增就推（默认）
+#   2️⃣ morning_evening    全天推送 + 晚间汇总（推荐大多数人）
+#   3️⃣ daytime_incremental 07:00-23:00 增量推送+AI分析，23:00-07:00 静默
+#   4️⃣ office_hours       工作日三段式：到岗速览→午间热点→收工汇总
+#   5️⃣ night_owl          午后速览 + 深夜全天汇总
+#   6️⃣ custom             完全自定义（需要编辑本文件底部的 custom 段）
 #
 # 想自定义？两种方式：
 #   1. 直接翻到本文件底部的「自定义模式」部分
@@ -192,6 +193,58 @@ presets:
         periods: ["evening_summary"]
 
     # 周映射 ── 每天用哪个日计划（1=周一 ... 7=周日）
+    week_map:
+      1: "all_day"
+      2: "all_day"
+      3: "all_day"
+      4: "all_day"
+      5: "all_day"
+      6: "all_day"
+      7: "all_day"
+
+
+  # ───────────────────────────────────────────────────────────
+  # 2.5️⃣ daytime_incremental - 日间增量推送（23点后静默）
+  #
+  # 07:00-23:00 推送增量 + AI 分析，23:00-07:00 不推送（静默期）。
+  # 适合：希望夜间不被打扰、白天有新增就推送的用户。
+  #
+  # 日间（07:00-23:00）：推送 ✓ | AI分析 ✓ | 增量模式
+  # 夜间（23:00-07:00）：推送 ✗ | AI分析 ✗ | 仅采集
+  # ───────────────────────────────────────────────────────────
+  daytime_incremental:
+    name: "日间增量"
+    description: "07:00-23:00 增量推送+AI分析，23:00-07:00 静默不打扰。"
+
+    # 默认配置 ── 23:00-07:00 静默期（不命中 daytime_active 时）
+    default:
+      collect: true                # 静默期仍采集，保证数据连续
+      analyze: false
+      ai_mode: "incremental"
+      push: false                  # 夜间不推送
+      report_mode: "incremental"
+      once:
+        analyze: false
+        push: false
+
+    # 日间时段：07:00-23:00
+    periods:
+      daytime_active:
+        name: "日间推送"
+        start: "07:00"
+        end: "23:00"
+        analyze: true              # AI 分析
+        ai_mode: "incremental"    # 分析增量内容
+        push: true                 # 有新增就推送
+        report_mode: "incremental" # 只推送新增
+        once:
+          analyze: false          # 每次有内容都可分析
+          push: false             # 增量模式本身控制推送频率
+
+    day_plans:
+      all_day:
+        periods: ["daytime_active"]
+
     week_map:
       1: "all_day"
       2: "all_day"

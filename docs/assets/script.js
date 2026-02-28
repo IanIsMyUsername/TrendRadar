@@ -3347,19 +3347,26 @@ window.closeVersionModal = function() {
 // 13. 平台添加弹窗逻辑
 // ==========================================
 
-// 预定义可用平台列表 (仅包含官方默认支持的平台)
+// 预定义可用平台列表 (基于 newsnow 支持的平台)
 const PRESET_PLATFORMS = [
     { key: 'toutiao', name: '今日头条' },
     { key: 'baidu', name: '百度热搜' },
-    { key: 'wallstreetcn-hot', name: '华尔街见闻' },
-    { key: 'thepaper', name: '澎湃新闻' },
-    { key: 'bilibili-hot-search', name: 'bilibili 热搜' },
-    { key: 'cls-hot', name: '财联社热门' },
-    { key: 'ifeng', name: '凤凰网' },
-    { key: 'tieba', name: '贴吧' },
     { key: 'weibo', name: '微博' },
-    { key: 'douyin', name: '抖音' },
-    { key: 'zhihu', name: '知乎' }
+    { key: 'thepaper', name: '澎湃新闻' },
+    { key: 'cankaoxiaoxi', name: '参考消息' },
+    { key: 'zaobao', name: '联合早报' },
+    { key: 'ifeng', name: '凤凰网' },
+    { key: 'wallstreetcn-hot', name: '华尔街见闻' },
+    { key: 'cls-hot', name: '财联社热门' },
+    { key: 'xueqiu', name: '雪球' },
+    { key: 'gelonghui', name: '格隆汇' },
+    { key: 'zhihu', name: '知乎' },
+    { key: 'ithome', name: 'IT之家' },
+    { key: 'juejin', name: '掘金' },
+    { key: 'github', name: 'GitHub' },
+    { key: 'bilibili-hot-search', name: 'bilibili 热搜' },
+    { key: 'tieba', name: '贴吧' },
+    { key: 'douyin', name: '抖音' }
 ];
 
 /**
@@ -3610,11 +3617,12 @@ function fillRssUrl(url) {
 // ==========================================
 
 const PRESET_META = {
-    morning_evening: { icon: 'fa-sun', color: 'text-amber-500', bg: 'bg-amber-50', recommend: true },
-    always_on:       { icon: 'fa-bolt', color: 'text-blue-500', bg: 'bg-blue-50' },
-    office_hours:    { icon: 'fa-briefcase', color: 'text-green-500', bg: 'bg-green-50' },
-    night_owl:       { icon: 'fa-moon', color: 'text-indigo-500', bg: 'bg-indigo-50' },
-    custom:          { icon: 'fa-sliders', color: 'text-purple-500', bg: 'bg-purple-50' }
+    morning_evening:     { icon: 'fa-sun', color: 'text-amber-500', bg: 'bg-amber-50', recommend: true },
+    always_on:          { icon: 'fa-bolt', color: 'text-blue-500', bg: 'bg-blue-50' },
+    daytime_incremental: { icon: 'fa-sunrise', color: 'text-orange-500', bg: 'bg-orange-50' },
+    office_hours:       { icon: 'fa-briefcase', color: 'text-green-500', bg: 'bg-green-50' },
+    night_owl:          { icon: 'fa-moon', color: 'text-indigo-500', bg: 'bg-indigo-50' },
+    custom:             { icon: 'fa-sliders', color: 'text-purple-500', bg: 'bg-purple-50' }
 };
 
 const DAY_NAMES = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
@@ -3687,7 +3695,7 @@ function syncTimelineToUI() {
         const label = presetCfg?.name || meta.label || name;
         const desc = presetCfg?.description || meta.desc || '';
         const isActive = name === activePreset;
-        const isProtected = ['morning_evening', 'always_on', 'office_hours', 'night_owl', 'custom'].includes(name);
+        const isProtected = ['morning_evening', 'always_on', 'daytime_incremental', 'office_hours', 'night_owl', 'custom'].includes(name);
         html += `
             <div class="tl-preset-card ${isActive ? 'selected' : ''}" data-preset="${name}">
                 ${meta.recommend ? '<div class="tl-recommend-badge">推荐</div>' : ''}
@@ -4906,7 +4914,7 @@ window.duplicateTlPeriod = function(presetName, periodKey) {
 
 // ── 删除预设模式 ──
 
-const PROTECTED_PRESETS = ['morning_evening', 'always_on', 'office_hours', 'night_owl'];
+const PROTECTED_PRESETS = ['morning_evening', 'always_on', 'daytime_incremental', 'office_hours', 'night_owl'];
 
 window.deleteTlPreset = function(presetName) {
     if (PROTECTED_PRESETS.includes(presetName)) {
