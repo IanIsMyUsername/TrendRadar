@@ -297,6 +297,8 @@ def _load_ai_analysis_config(config_data: Dict) -> Dict:
         "INCLUDE_RSS": ai_config.get("include_rss", True),
         "INCLUDE_RANK_TIMELINE": ai_config.get("include_rank_timeline", False),
         "INCLUDE_STANDALONE": ai_config.get("include_standalone", False),
+        "INCLUDE_ARTICLE_CONTENT": ai_config.get("include_article_content", False),
+        "MAX_ARTICLES_TO_READ": ai_config.get("max_articles_to_read", 5),
     }
 
 

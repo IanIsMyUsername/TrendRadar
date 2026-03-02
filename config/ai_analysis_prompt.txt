@@ -158,6 +158,9 @@
 ## 热榜新闻
 {news_content}
 
+## 新闻正文（已读取部分文章，请基于正文做深度分析）
+{article_content}
+
 ## RSS 订阅
 {rss_content}
 

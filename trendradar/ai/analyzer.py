@@ -76,6 +76,8 @@ class AIAnalyzer:
         self.include_rss = analysis_config.get("INCLUDE_RSS", True)
         self.include_rank_timeline = analysis_config.get("INCLUDE_RANK_TIMELINE", False)
         self.include_standalone = analysis_config.get("INCLUDE_STANDALONE", False)
+        self.include_article_content = analysis_config.get("INCLUDE_ARTICLE_CONTENT", False)
+        self.max_articles_to_read = analysis_config.get("MAX_ARTICLES_TO_READ", 5)
         self.language = analysis_config.get("LANGUAGE", "Chinese")
 
         # 加载提示词模板
@@ -166,6 +168,9 @@ class AIAnalyzer:
         news_content, rss_content, hotlist_total, rss_total, analyzed_count = self._prepare_news_content(stats, rss_stats)
         total_news = hotlist_total + rss_total
 
+        # 读取新闻正文（若启用）
+        article_content = self._fetch_article_content(stats) if self.include_article_content else ""
+
         if not news_content and not rss_content:
             return AIAnalysisResult(
                 success=False,
@@ -194,6 +199,10 @@ class AIAnalyzer:
         user_prompt = user_prompt.replace("{platforms}", ", ".join(platforms) if platforms else "多平台")
         user_prompt = user_prompt.replace("{keywords}", ", ".join(keywords[:20]) if keywords else "无")
         user_prompt = user_prompt.replace("{news_content}", news_content)
+        user_prompt = user_prompt.replace(
+            "{article_content}",
+            article_content if article_content else "（未启用正文读取，或读取失败）"
+        )
         user_prompt = user_prompt.replace("{rss_content}", rss_content)
         user_prompt = user_prompt.replace("{language}", self.language)
 
@@ -366,6 +375,53 @@ class AIAnalyzer:
         total_count = news_count + rss_count
 
         return news_content, rss_content, hotlist_total, rss_total, total_count
+
+    def _fetch_article_content(self, stats: List[Dict]) -> str:
+        """
+        从热榜新闻中读取前 N 篇正文，用于 AI 深度分析
+
+        Returns:
+            格式化的正文内容字符串，无内容时返回空字符串
+        """
+        if not stats or self.max_articles_to_read <= 0:
+            return ""
+
+        urls = []
+        seen = set()
+        for stat in stats:
+            for t in stat.get("titles", []):
+                if not isinstance(t, dict):
+                    continue
+                url = t.get("url", "") or t.get("mobileUrl", "")
+                if url and url not in seen and url.startswith(("http://", "https://")):
+                    seen.add(url)
+                    urls.append((t.get("title", ""), url))
+                if len(urls) >= self.max_articles_to_read:
+                    break
+            if len(urls) >= self.max_articles_to_read:
+                break
+
+        if not urls:
+            return ""
+
+        from trendradar.utils.article_reader import read_articles_batch
+
+        url_list = [u for _, u in urls]
+        title_by_url = {u: t for t, u in urls}
+
+        print(f"[AI] 正在读取 {len(url_list)} 篇文章正文...")
+        contents = read_articles_batch(url_list, max_count=len(url_list))
+
+        if not contents:
+            print("[AI] 正文读取失败或全部超时")
+            return ""
+
+        lines = []
+        for url, content in contents.items():
+            title = title_by_url.get(url, "未知")
+            lines.append(f"\n### 【{title}】\n{content}\n")
+        print(f"[AI] 成功读取 {len(contents)} 篇正文")
+        return "\n".join(lines)
 
     def _call_ai(self, user_prompt: str) -> str:
         """调用 AI API（使用 LiteLLM）"""
