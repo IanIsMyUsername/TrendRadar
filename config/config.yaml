@@ -42,7 +42,7 @@ app:
 # ===============================================================
 schedule:
   enabled: true                         # 是否启用调度系统
-  preset: "daytime_incremental"             # 预设模板名称（见上方说明）
+  preset: "custom"                      # 预设模板名称（见上方说明）
 
 
 # ===============================================================
@@ -55,12 +55,6 @@ platforms:
   sources:
     - id: "weibo"
       name: "微博"
-    - id: "baidu"
-      name: "百度热搜"
-    - id: "zhihu"
-      name: "知乎"
-    - id: "douyin"
-      name: "抖音"
 
 
 

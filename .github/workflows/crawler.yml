@@ -33,10 +33,10 @@ on:
     #
     # 示例 / Examples:
     #   "15 * * * *"     → 每小时第15分钟 / minute 15 every hour
-    #   "0 */3 * * *"    → 每3小时运行一次 / every 3 hours
+    #   "0 */2 * * *"    → 每2小时运行一次 / every 2 hours
     #   "30 0-14 * * *"  → 北京时间 8:00-22:00 每小时第30分钟 / Beijing 8am-10pm
     #
-    - cron: "0 */3 * * *"
+    - cron: "0 */2 * * *"
 
   workflow_dispatch:
 
